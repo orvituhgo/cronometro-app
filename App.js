@@ -5,11 +5,11 @@ export default function App() {
   const [contagem, setContagem] = useState('00:00')
   const [pausado, setPausado]  = useState(true)
 
-  const minutos = 0
-  const segundos = 0
-
-  useEffect(() => {}, [])
+  let minutos = 0
+  let segundos = 0
+  let timer
   
+  //functional
   function pad(number, pad) {
     let num = number.toString()
     while (num.length < pad) {
@@ -17,8 +17,33 @@ export default function App() {
     }
     return num
   }
-
+  function contador() {
+    if (!pausado) {
+      if (minutos === 99 && segundos === 60) {
+        minutos = 0
+        segundos = 0
+      }
+      if (segundos === 60) {
+        minutos++
+        segundos = 0
+      }
+      segundos++
+      setContagem(`${pad(minutos, 2)}:${pad(segundos, 2)}`)
+    }
+  }
+  //handlers
   function iniciarContagem(){
+    setPausado(false)
+    timer = setInterval(contador, 1000);
+  }
+  function pararContagem(){
+    setPausado(true)
+    clearInterval(timer)
+  }
+  function resetContagem(){
+    setPausado(true)
+    minutos = 0
+    segundos = 0
     setContagem(`${pad(minutos, 2)}:${pad(segundos, 2)}`)
   }
 
@@ -34,12 +59,12 @@ export default function App() {
             <Text style={styles.btnText}>Iniciar</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.btn}>
+        <TouchableOpacity onPress={pararContagem} style={styles.btn}>
           <View style={styles.btnContainer}>
             <Text style={styles.btnText}>Pausar</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.btn}>
+        <TouchableOpacity onPress={resetContagem} style={styles.btn}>
           <View style={styles.btnContainer}>
             <Text style={styles.btnText}>Reiniciar</Text>
           </View>
@@ -73,7 +98,9 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   btnText: {
-    color: '#303030'
+    color: '#303030',
+    fontSize: 18,
+    fontWeight: 400
   },
   img: {
     height: 300,
@@ -83,6 +110,7 @@ const styles = StyleSheet.create({
     color: '#303030',
     position: 'absolute',
     fontSize: 48,
+    fontWeight: 300,
     paddingTop: 50
   },
   clockContainer: {
